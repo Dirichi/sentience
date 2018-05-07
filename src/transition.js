@@ -10,6 +10,11 @@ class Transition {
   incrementReward(reward) {
     this.reward += reward
   }
+
+  complete(nextState, nextAction){
+    this.nextState = nextState
+    this.nextAction = nextAction
+  }
 }
 
 module.exports = Transition
