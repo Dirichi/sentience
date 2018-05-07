@@ -5,13 +5,13 @@ class AgentList {
   // that implements all the public methods of
   // the type
   // and some custom methods like find, build
-  constructor(values = [], agentFactory = new AgentFactory()) {
+  constructor(values = [], agentFactory = AgentFactory) {
     this.values = values
     this.agentFactory = agentFactory
   }
 
-  build(object, observables, actions) {
-    let agent = this._buildAgent(object, observables, actions)
+  build(object, observables, actions, policyType = 'QLVAAgent') {
+    let agent = this._buildAgent(object, observables, actions, policyType)
     object.agent_id = this.values.length
     this.values.push(agent)
   }
@@ -36,10 +36,10 @@ class AgentList {
     return this.values[object.agent_id]
   }
 
-  _buildAgent(object, observables, actions) {
+  _buildAgent(object, observables, actions, policyType) {
     this._preventDuplicates(object)
 
-    return this.agentFactory.build(object, observables, actions)
+    return this.agentFactory[policyType](object, observables, actions)
   }
 
   _preventDuplicates(object) {

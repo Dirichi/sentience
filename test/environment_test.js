@@ -12,10 +12,7 @@ describe('Environment', function() {
       object.move = () => object.y += 5
 
       env.createSentience([object], [observable], ['move'])
-      let agent = env.agents[0]
-
-      assert.deepEqual(agent.observables, [observable])
-      assert.deepEqual(agent.actions, ['move'])
+      assert.ok(env.agents.length == 1)
     })
 
     it('does not create multiple agents for the same object', function () {
