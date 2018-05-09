@@ -11,7 +11,7 @@ class Transition {
     this.reward += reward
   }
 
-  complete(nextState, nextAction){
+  complete(nextState, nextAction) {
     this.nextState = nextState
     this.nextAction = nextAction
   }

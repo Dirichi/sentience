@@ -28,6 +28,7 @@ class Agent {
     let action = this.policy.choose(state)
 
     this.currentTransition.complete(state, action)
+    this.policy.update(this.currentTransition)
   }
 
   perform(action) {

@@ -54,15 +54,18 @@ describe('Agent', function() {
 
   describe('#completeTransition', function() {
     it('completes the tranisition', function() {
+      let completeFunc = sinon.fake()
+      let updateFunc = sinon.fake()
+
       let observables = [{ features: () => [1] }, { features: () => [3] }]
-      let policy = { choose: (state) => 'up' }
+      let policy = { choose: (state) => 'up', update: updateFunc }
       let agent = new Agent({ observables: observables, policy: policy })
 
-      let completeFunc = sinon.fake()
       agent.currentTransition = { complete: completeFunc }
       agent.completeTransition()
 
       assert(completeFunc.calledWith([1, 3], 'up'))
+      assert(updateFunc.calledWith(agent.currentTransition))
     })
   })
 })
