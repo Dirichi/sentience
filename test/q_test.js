@@ -2,6 +2,7 @@ let Q = require('../src/q.js')
 let assert = require('assert')
 let sinon = require('sinon')
 let utils = require('../src/utils.js')
+let math = require('mathjs')
 
 describe('Q', function() {
   describe('#choose', function () {
@@ -12,7 +13,7 @@ describe('Q', function() {
               return [10, 5]
           }
         }
-        let q = new Q({ epsilon: 0, approximator: approximator, actions: ['up', 'down']})
+        let q = new Q({ epsilon: 0, approximator: approximator, actions: ['up', 'down'] })
 
         assert.equal(q.choose([1]), 'up')
       })
@@ -31,6 +32,55 @@ describe('Q', function() {
         assert(fakeGet.notCalled)
         assert.deepEqual(uniqueChoices.sort(), ['down', 'up'])
       })
+    })
+  })
+
+  describe('error', function () {
+    it('error = alpha * ((r + Q(s`,a`)) - Q(s,a))', function () {
+      let transition = {
+        state: [1],
+        action: 'A',
+        reward: 5,
+        nextState: [2],
+        nextAction: 'B'
+      }
+
+      let approximator = {
+        get: function (s, a) {
+          return s[0]
+        }
+      }
+
+      let policy = new Q({ alpha: 0.2, gamma: 0.8, actions: ['A', 'B'], approximator: approximator })
+      // 0.2 * ((5 + (0.8 * 2)) - 1) = 1.12
+      let err = policy.error(transition)
+      assert.equal(math.round(err, 2), 1.12)
+    })
+  })
+
+  describe('update', function () {
+    it('sends the error, state, and action to the approximator', function () {
+      let updateFunc = sinon.fake()
+
+      let transition = {
+        state: [1],
+        action: 'A',
+        reward: 5,
+        nextState: [2],
+        nextAction: 'B'
+      }
+
+      let approximator = {
+        get: function (s, a) {
+          return s[0]
+        },
+        update: updateFunc
+      }
+
+      let policy = new Q({ alpha: 0, gamma: 0.8, actions: ['A', 'B'], approximator: approximator })
+      policy.update(transition)
+
+      assert(updateFunc.calledWith(0, [1], 0))
     })
   })
 })
