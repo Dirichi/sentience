@@ -1,30 +1,39 @@
 let utils = require('./utils.js')
-const DEFAULT = { alpha: 0.2, gamma: 0.8, epsilon: 0.9, epsilonDecay: 0.9999 }
+let TransitionList = require('./transition_list.js')
 
 class Q {
   constructor(args) {
-    Object.assign(args, DEFAULT)
-    this.alpha = args.alpha
-    this.gamma = args.gamma
-    this.epsilon = args.epsilon
-    this.epsilonDecay = args.epsilonDecay
-    this.actions = args.actions
-    this.approximator = args.approximator
+    let defaultArgs = {
+      alpha: 0.1,
+      gamma: 0.8,
+      epsilon: 0.9,
+      epsilonDecay: 0.9999,
+      transitionList: new TransitionList()
+    }
+
+    let fullArgs = Object.assign(defaultArgs, args)
+
+    this.alpha = fullArgs.alpha
+    this.gamma = fullArgs.gamma
+    this.epsilon = fullArgs.epsilon
+    this.epsilonDecay = fullArgs.epsilonDecay
+    this.actions = fullArgs.actions
+    this.approximator = fullArgs.approximator
+    this.transitionList = fullArgs.transitionList
   }
 
   choose(state) {
-    if (Math.random() > this.epsilon) {
-      return this._bestAction(state)
-    }
-
-    return this._randomAction()
+    return Math.random() > this.epsilon ? this._bestAction(state) : this._randomAction()
   }
 
   update(transition) {
     let t = this._transformTransition(transition)
-    let err = this.error(t)
+    this.transitionList.store(t)
 
-    this.approximator.update(err, t.state, t.action)
+    let sampleT = this.transitionList.sample()
+    let err = this.error(sampleT)
+    this.approximator.update(err, sampleT.state, sampleT.action)
+
     this.epsilon *= this.epsilonDecay
   }
 
@@ -54,7 +63,9 @@ class Q {
   }
 
   _transformTransition(transition) {
-    // bad. need a way for Transition to have its vectorized representation
+    // this method would not be necessary if q
+    // only dealt with the vector representation
+    // of actions, and not the full string form
 
     return {
       state: transition.state,

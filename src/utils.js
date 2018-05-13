@@ -18,3 +18,8 @@ module.exports.range = function (maximum) {
 module.exports.randomInRange = function (maximum) {
   return Math.floor(Math.random() * maximum)
 }
+
+module.exports.randomChoiceFrom = function(array) {
+  let randomIndex = module.exports.randomInRange(array.length)
+  return array[randomIndex]
+}

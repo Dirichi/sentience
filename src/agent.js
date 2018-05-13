@@ -24,10 +24,10 @@ class Agent {
   }
 
   completeTransition() {
-    let state = this.state
-    let action = this.policy.choose(state)
+    let nextState = this.state
+    let nextAction = this.policy.choose(nextState)
 
-    this.currentTransition.complete(state, action)
+    this.currentTransition.complete(nextState, nextAction)
     this.policy.update(this.currentTransition)
   }
 
