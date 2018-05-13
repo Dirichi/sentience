@@ -13,11 +13,7 @@ class Q {
   }
 
   choose(state) {
-    if (Math.random() > this.epsilon) {
-      return this._bestAction(state)
-    }
-
-    return this._randomAction()
+    return Math.random() > this.epsilon ? this._bestAction(state) : this._randomAction()
   }
 
   update(transition) {
@@ -54,7 +50,9 @@ class Q {
   }
 
   _transformTransition(transition) {
-    // bad. need a way for Transition to have its vectorized representation
+    // this method would not be necessary if q
+    // only dealt with the vector representation
+    // of actions, and not the full string form
 
     return {
       state: transition.state,
