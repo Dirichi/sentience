@@ -1,6 +1,6 @@
 let AgentFactory = require('../src/agent_factory.js')
 let Q = require('../src/q.js')
-let LinearValueApproximator = require('../src/linear_value_approximator.js')
+let LinearApproximator = require('../src/linear_approximator.js')
 let assert = require('assert')
 
 describe('AgentFactory', function() {
@@ -30,7 +30,7 @@ describe('AgentFactory', function() {
       assert.ok(policy instanceof Q)
       assert.deepEqual(policy.actions, ['move'])
 
-      assert.ok(approximator instanceof LinearValueApproximator)
+      assert.ok(approximator instanceof LinearApproximator)
       assert.equal(approximator.statesSize, 3)
       assert.equal(approximator.actionsSize, 1)
     })

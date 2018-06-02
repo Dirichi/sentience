@@ -1,12 +1,12 @@
 let Agent = require('./agent.js')
 let Q = require('./q.js')
 let Observable = require('./observable.js')
-let LinearValueApproximator = require('./linear_value_approximator.js')
+let LinearApproximator = require('./linear_approximator.js')
 let utils = require('./utils.js')
 
 class AgentFactory {
   static QLVAAgent(object, observables, actions) {
-    let approximator = new LinearValueApproximator({
+    let approximator = new LinearApproximator({
       statesSize: observables.reduce((acc, o) => acc + o.attributes.length, 0),
       actionsSize: actions.length
     })
