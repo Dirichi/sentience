@@ -1,7 +1,7 @@
 let utils = require('./utils.js')
 let math = require('mathjs')
 
-class LinearValueApproximator {
+class LinearApproximator {
   constructor(args) {
     this.statesSize = args.statesSize
     this.actionsSize = args.actionsSize
@@ -20,9 +20,9 @@ class LinearValueApproximator {
     let actionWeights = math.transpose(this.weights).valueOf()[action]
     let updatedWeights = math.add(delta, actionWeights)
 
-    let weightIndex = math.index(math.range(0, this.actionsSize), action)
+    let weightIndex = math.index(math.range(0, this.statesSize), action)
     this.weights.subset(weightIndex, updatedWeights)
   }
 }
 
-module.exports = LinearValueApproximator
+module.exports = LinearApproximator
