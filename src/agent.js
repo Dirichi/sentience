@@ -6,6 +6,7 @@ class Agent {
     this.observables = args.observables
     this.policy = args.policy
     this.actions = args.actions
+    this.currentTransition = {}
   }
 
   get state() {
