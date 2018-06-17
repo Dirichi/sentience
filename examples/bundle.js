@@ -59280,10 +59280,10 @@ let TransitionList = require('./transition_list.js')
 class Q {
   constructor(args) {
     let defaultArgs = {
-      alpha: 0.2,
+      alpha: 0.05,
       gamma: 0.8,
-      epsilon: 0.9,
-      epsilonDecay: 0.9999,
+      epsilon: 0.99,
+      epsilonDecay: 0.9995,
       transitionList: new TransitionList()
     }
 
@@ -59439,7 +59439,7 @@ let utils = require('./utils.js')
 
 class TransitionList {
   constructor(args = {}) {
-    let defaultArgs = { maximumSize: 500, values: [] }
+    let defaultArgs = { maximumSize: 1000, values: [] }
     let fullArgs = Object.assign(defaultArgs, args)
 
     this.values = fullArgs.values

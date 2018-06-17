@@ -4,10 +4,10 @@ let TransitionList = require('./transition_list.js')
 class Q {
   constructor(args) {
     let defaultArgs = {
-      alpha: 0.1,
+      alpha: 0.05,
       gamma: 0.8,
-      epsilon: 0.9,
-      epsilonDecay: 0.9999,
+      epsilon: 0.99,
+      epsilonDecay: 0.9995,
       transitionList: new TransitionList()
     }
 

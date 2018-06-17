@@ -2,7 +2,7 @@ let utils = require('./utils.js')
 
 class TransitionList {
   constructor(args = {}) {
-    let defaultArgs = { maximumSize: 500, values: [] }
+    let defaultArgs = { maximumSize: 1000, values: [] }
     let fullArgs = Object.assign(defaultArgs, args)
 
     this.values = fullArgs.values
