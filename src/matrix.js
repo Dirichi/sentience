@@ -71,10 +71,6 @@ class Matrix {
     return this._values[0].length
   }
 
-  set(row, column, value) {
-
-  }
-
   setColumn(columnIndex, value) {
     this._checkAllowedColumnIndex(columnIndex)
     this._checkCompatibleColumn(value)
@@ -95,10 +91,6 @@ class Matrix {
     if (columnArray.length != this.numRows) {
       throw new Error(`incompatible dimensions for column (replacement length: ${columnArray.length}, numRows: ${this.numRows})`)
     }
-  }
-
-  get(row, column) {
-
   }
 
   size() {
