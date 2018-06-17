@@ -3,16 +3,14 @@ let Transition = require('./transition.js')
 class Agent {
   constructor(args) {
     this.object = args.object
-    this.observables = args.observables
+    this.stateFunction = args.stateFunction
     this.policy = args.policy
     this.actions = args.actions
     this.currentTransition = {}
   }
 
   get state() {
-    return this.observables.reduce(
-      (arr, observable) => arr.concat(observable.features()), []
-    )
+    return this.stateFunction.call()
   }
 
   beginTransition() {
