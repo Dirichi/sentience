@@ -1,27 +1,28 @@
 let utils = require('./utils.js')
-let math = require('mathjs')
+let Matrix = require('./matrix.js')
 
 class LinearApproximator {
   constructor(args) {
     this.statesSize = args.statesSize
     this.actionsSize = args.actionsSize
-    this.weights = utils.random2DMatrix(args.statesSize, args.actionsSize)
+    this.weights = Matrix.random(args.statesSize, args.actionsSize)
   }
 
   get(state, actionIndex = 'all') {
-    let values = math.multiply(math.matrix(state), this.weights).valueOf()
+    let state_matrix =  new Matrix([state])
+    let values = Matrix.product(state_matrix, this.weights).valueOf()[0]
     let return_value = actionIndex == 'all' ? values : values[actionIndex]
 
     return return_value
   }
 
   update(err, state, action) {
-    let delta = math.multiply(state, err)
-    let actionWeights = math.transpose(this.weights).valueOf()[action]
-    let updatedWeights = math.add(delta, actionWeights)
+    let state_matrix =  new Matrix([state])
+    let delta = Matrix.scalarProduct(state_matrix, err).valueOf()[0]
+    let actionWeights = this.weights.columns()[action]
+    let updatedWeights = actionWeights.map((_, index) => actionWeights[index] + delta[index])
 
-    let weightIndex = math.index(math.range(0, this.statesSize), action)
-    this.weights.subset(weightIndex, updatedWeights)
+    this.weights.setColumn(action, updatedWeights)
   }
 }
 
