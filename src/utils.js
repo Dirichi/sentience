@@ -1,12 +1,3 @@
-let math = require('mathjs')
-
-module.exports.random2DMatrix = function(ndimX, ndimY) {
-  let totalElements  = ndimX * ndimY
-  let array = Array.from({length: totalElements}, () => Math.random())
-  array = math.reshape(array, [ndimX, ndimY])
-  return math.matrix(array)
-}
-
 module.exports.uniqueValues = function (array) {
   return [...new Set(array)]
 }
