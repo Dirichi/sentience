@@ -4,9 +4,9 @@ let sinon = require('sinon')
 
 describe('Agent', function() {
   describe('#state', function() {
-    it('returns a concatenation the features of its observables', function() {
-      let observables = [{ features: () => [1] }, { features: () => [3] }]
-      let agent = new Agent({ observables: observables })
+    it('calls the passed in state function', function() {
+      let stateFunc = () => [1, 3]
+      let agent = new Agent({ stateFunction: stateFunc })
 
       assert.deepEqual(agent.state, [1, 3])
     })
@@ -14,12 +14,12 @@ describe('Agent', function() {
 
   describe('#beginTransition', function() {
     it('creates and stores a new Transition', function() {
-      let observables = [{ features: () => [1] }, { features: () => [3] }]
+      let stateFunc = () => [1, 3]
       let policy = { choose: (state) => 'up' }
       let obj = { y: 2 }
       obj.up = () => obj.y += 1
 
-      let agent = new Agent({ object: obj, observables: observables, policy: policy })
+      let agent = new Agent({ object: obj, stateFunction: stateFunc, policy: policy })
       agent.beginTransition()
       let transition = agent.currentTransition
 
@@ -29,12 +29,12 @@ describe('Agent', function() {
     })
 
     it('performs the action suggested by its policy', function() {
-      let observables = [ { features: () => [1] }, { features: () => [3] }]
+      let stateFunc = () => [1, 3]
       let policy = { choose: (state) => 'up' }
       let obj = { y: 2 }
       obj.up = () => obj.y += 1
 
-      let agent = new Agent({ object: obj, observables: observables, policy: policy })
+      let agent = new Agent({ object: obj, stateFunction: stateFunc, policy: policy })
       agent.beginTransition()
 
       assert.equal(obj.y, 3)
@@ -57,9 +57,9 @@ describe('Agent', function() {
       let completeFunc = sinon.fake()
       let updateFunc = sinon.fake()
 
-      let observables = [{ features: () => [1] }, { features: () => [3] }]
+      let stateFunc = () => [1, 3]
       let policy = { choose: (state) => 'up', update: updateFunc }
-      let agent = new Agent({ observables: observables, policy: policy })
+      let agent = new Agent({ stateFunction: stateFunc, policy: policy })
 
       agent.currentTransition = { complete: completeFunc }
       agent.completeTransition()
