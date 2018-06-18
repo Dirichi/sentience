@@ -1,38 +1,3 @@
-position_hash = {
-  x0y0: 0,
-  x1y0: 0,
-  x2y0: 1,
-  x3y0: 0,
-  x4y0: 0,
-  x0y1: 0,
-  x1y1: 0,
-  x2y1: 1,
-  x3y1: 0,
-  x4y1: 0,
-  x0y2: 0,
-  x1y2: 0,
-  x2y2: 1,
-  x3y2: 0,
-  x4y2: 0,
-  x0y3: 0,
-  x1y3: 0,
-  x2y3: 1,
-  x3y3: 0,
-  x4y4: 0,
-  x0y4: 0,
-  x1y4: 0,
-  x2y4: 1,
-  x3y4: 0,
-  x4y4: 0,
-}
-
-positions = Object.keys(position_hash)
-
-
-function allStates() {
-  positions
-}
-
 class RewardBuffer {
   constructor(limit) {
     this.limit = limit
@@ -56,103 +21,68 @@ class RewardBuffer {
 }
 let counter = 0
 let env = new Environment()
-let chaser = {
-    y: 0.5,
-    x: 0.5,
-    x0y0: 0,
-    x1y0: 0,
-    x2y0: 1,
-    x3y0: 0,
-    x4y0: 0,
-    x0y1: 0,
-    x1y1: 0,
-    x2y1: 1,
-    x3y1: 0,
-    x4y1: 0,
-    x0y2: 0,
-    x1y2: 0,
-    x2y2: 1,
-    x3y2: 0,
-    x4y2: 0,
-    x0y3: 0,
-    x1y3: 0,
-    x2y3: 1,
-    x3y3: 0,
-    x4y4: 0,
-    x0y4: 0,
-    x1y4: 0,
-    x2y4: 1,
-    x3y4: 0,
-    x4y4: 0,
-    attributes: positions }
-let ball = {
-    y: 0.5,
-    x: 0.5,
-    x0y0: 0,
-    x1y0: 0,
-    x2y0: 1,
-    x3y0: 0,
-    x4y0: 0,
-    x0y1: 0,
-    x1y1: 0,
-    x2y1: 1,
-    x3y1: 0,
-    x4y1: 0,
-    x0y2: 0,
-    x1y2: 0,
-    x2y2: 1,
-    x3y2: 0,
-    x4y2: 0,
-    x0y3: 0,
-    x1y3: 0,
-    x2y3: 1,
-    x3y3: 0,
-    x4y4: 0,
-    x0y4: 0,
-    x1y4: 0,
-    x2y4: 1,
-    x3y4: 0,
-    x4y4: 0,
-    attributes: positions
-  }
+
+let chaser = { y: 0.5, x: 0.5 }
+let ball = { y: 0.5, x: 0.5 }
+
 let tick = 0
 let buffer = new RewardBuffer(500)
 let points = []
-const NO_MOTION = 0
 
 let Moveable = {
-  up() {
-    this.y > 0.1 ? this.y -= 0.1 : NO_MOTION
-    this.setAttributes()
-  },
-  down() {
-    this.y < 0.9 ? this.y += 0.1 : NO_MOTION
-    this.setAttributes()
-   },
-  left() {
-    this.x > 0.1 ? this.x -= 0.1 : NO_MOTION
-    this.setAttributes()
-  },
-  right() {
-    this.x < 0.9 ? this.x += 0.1 : NO_MOTION
-    this.setAttributes()
-  },
-  stop() { NO_MOTION },
-  setAttributes() {
-    xIndex = parseInt(this.x * 5)
-    yIndex = parseInt(this.y * 5)
-    for (var i = 0; i < positions.length; i++) {
-      this[positions[i]] = 0
+  up() { this.y = Math.max(0, this.y - 0.1) },
+  down() { this.y = Math.min(1, this.y + 0.1) },
+  left() { this.x = Math.max(0, this.x - 0.1) },
+  right() { this.x = Math.min(1, this.x + 0.1) },
+  stop() {},
+}
+
+function stateFunc() {
+  let ballLocationMap = []
+  let chaserLocationMap = []
+
+  let ballXIndex = parseInt(ball.x * 5)
+  let ballYIndex = parseInt(ball.y * 5)
+  let chaserXIndex = parseInt(chaser.x * 5)
+  let chaserYIndex = parseInt(chaser.y * 5)
+
+  for (var i = 0; i < 5; i++) {
+    for (var j = 0; j < 5; j++) {
+      if (ballXIndex == i && ballYIndex == j) {
+        ballLocationMap.push(1)
+      }
+      else {
+        ballLocationMap.push(0)
+      }
     }
-    this['x' + xIndex + 'y' + yIndex] = 1
   }
+
+  for (var i = 0; i < 5; i++) {
+    for (var j = 0; j < 5; j++) {
+      if (chaserXIndex == i && chaserYIndex == j) {
+        chaserLocationMap.push(1)
+      }
+      else {
+        chaserLocationMap.push(0)
+      }
+    }
+  }
+
+  return ballLocationMap.concat(chaserLocationMap)
 }
 
 function setup() {
   createCanvas(1000, 500)
   Object.assign(ball, Moveable)
   Object.assign(chaser, Moveable)
-  env.createSentience([chaser], [ball, chaser], ['up', 'down', 'left', 'right', 'stop'])
+
+  let args = {
+    actions: ['up', 'down', 'left', 'right', 'stop'],
+    stateFunction: stateFunc,
+    stateSize: 50,
+    policyType: 'QLVAAgent'
+  }
+  env.createSentience([chaser], args)
 
   env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) == 0, 0.5)
   env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) > 0.1, -0.1)
@@ -178,7 +108,6 @@ function animate() {
   if (tick > 100) {
     if(counter > 3) { counter = 0 }
     let actionChoice = ['up', 'left', 'down', 'right'][counter]
-    // let actionChoice = randomChoiceFrom(['up', 'left', 'down', 'right'])
     ball[actionChoice]()
     tick = 0
     counter += 1
@@ -195,11 +124,6 @@ function animate() {
 function distance(x, y, x2, y2) {
   let squareDistance = ((x - x2) ** 2) + ((y - y2) ** 2)
   return Math.sqrt(squareDistance)
-}
-
-function randomChoiceFrom(array) {
-  let randomIndex = Math.floor(Math.random() * array.length)
-  return array[randomIndex]
 }
 
 function plotReward(points, min = -0.5, max = 0.5, xstart = 500, xend = 980, ystart = 480, yend = 20) {

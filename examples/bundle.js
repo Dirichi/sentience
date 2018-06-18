@@ -4,16 +4,14 @@ let Transition = require('./transition.js')
 class Agent {
   constructor(args) {
     this.object = args.object
-    this.observables = args.observables
+    this.stateFunction = args.stateFunction
     this.policy = args.policy
     this.actions = args.actions
     this.currentTransition = {}
   }
 
   get state() {
-    return this.observables.reduce(
-      (arr, observable) => arr.concat(observable.features()), []
-    )
+    return this.stateFunction.call()
   }
 
   beginTransition() {
@@ -51,43 +49,42 @@ class Agent {
 
 module.exports = Agent
 
-},{"./transition.js":12}],2:[function(require,module,exports){
+},{"./transition.js":11}],2:[function(require,module,exports){
 let Agent = require('./agent.js')
 let Q = require('./q.js')
-let Observable = require('./observable.js')
 let LinearApproximator = require('./linear_approximator.js')
 let utils = require('./utils.js')
 
 class AgentFactory {
-  static QLVAAgent(object, observables, actions) {
+  static QLVAAgent(object, args) {
     let approximator = new LinearApproximator({
-      statesSize: observables.reduce((acc, o) => acc + o.attributes.length, 0),
-      actionsSize: actions.length
+      statesSize: args.stateSize,
+      actionsSize: args.actions.length
     })
 
-    let policy = new Q({ approximator: approximator, actions: actions })
+    let policy = new Q({ approximator: approximator, actions: args.actions })
 
-    return this.create(object, observables, actions, policy)
+    return this._build(object, args.stateFunction, args.actions, policy)
   }
 
-  static create(object, observables, actions, policy) {
+  static build(object, args) {
+    return this[args.policyType](object, args)
+  }
+
+  static _build(object, stateFunction, actions, policy) {
 
     return new Agent({
       object: object,
-      observables: this._wrapObservables(observables),
-      policy: policy,
-      actions: actions
+      stateFunction: stateFunction,
+      actions: actions,
+      policy: policy
     })
-  }
-
-  static _wrapObservables(observables) {
-    return observables.map((o) => Object.assign(o, Observable))
   }
 }
 
 module.exports = AgentFactory
 
-},{"./agent.js":1,"./linear_approximator.js":5,"./observable.js":7,"./q.js":8,"./utils.js":14}],3:[function(require,module,exports){
+},{"./agent.js":1,"./linear_approximator.js":5,"./q.js":7,"./utils.js":13}],3:[function(require,module,exports){
 let AgentFactory = require('./agent_factory.js')
 
 class AgentList {
@@ -100,8 +97,8 @@ class AgentList {
     this.agentFactory = agentFactory
   }
 
-  build(object, observables, actions, policyType = 'QLVAAgent') {
-    let agent = this._buildAgent(object, observables, actions, policyType)
+  build(object, agentArgs) {
+    let agent = this._buildAgent(object, agentArgs)
     object.agent_id = this.values.length
     this.values.push(agent)
   }
@@ -126,10 +123,10 @@ class AgentList {
     return this.values[object.agent_id]
   }
 
-  _buildAgent(object, observables, actions, policyType) {
+  _buildAgent(object, agentArgs) {
     this._preventDuplicates(object)
 
-    return this.agentFactory[policyType](object, observables, actions)
+    return this.agentFactory.build(object, agentArgs)
   }
 
   _preventDuplicates(object) {
@@ -160,8 +157,8 @@ class Environment {
     return this.rewardAssignerList.values
   }
 
-  createSentience(objects, observables, actions) {
-    objects.forEach((object) => this.agentList.build(object, observables, actions))
+  createSentience(objects, agentArgs) {
+    objects.forEach((object) => this.agentList.build(object, agentArgs))
   }
 
   rewardSentience(objects, condition, credit) {
@@ -184,7 +181,7 @@ class Environment {
 
 module.exports = Environment
 
-},{"./agent_list.js":3,"./reward_assigner_list.js":10}],5:[function(require,module,exports){
+},{"./agent_list.js":3,"./reward_assigner_list.js":9}],5:[function(require,module,exports){
 let utils = require('./utils.js')
 let Matrix = require('./matrix.js')
 
@@ -215,7 +212,7 @@ class LinearApproximator {
 
 module.exports = LinearApproximator
 
-},{"./matrix.js":6,"./utils.js":14}],6:[function(require,module,exports){
+},{"./matrix.js":6,"./utils.js":13}],6:[function(require,module,exports){
 class Matrix {
   constructor(array) {
     this._values = array
@@ -323,25 +320,6 @@ class Matrix {
 module.exports = Matrix
 
 },{}],7:[function(require,module,exports){
-let Observable = {
-  features() {
-    return this.attributes.map(attr => this._evaluatedAttribute(attr));
-  },
-
-  _evaluatedAttribute(attr) {
-    let value = this[attr]
-
-    if (typeof(value) != 'number') {
-      throw new Error('attribute should be numeric');
-    }
-
-    return value
-  }
-}
-
-module.exports = Observable
-
-},{}],8:[function(require,module,exports){
 let utils = require('./utils.js')
 let TransitionList = require('./transition_list.js')
 
@@ -423,7 +401,7 @@ class Q {
 
 module.exports = Q
 
-},{"./transition_list.js":13,"./utils.js":14}],9:[function(require,module,exports){
+},{"./transition_list.js":12,"./utils.js":13}],8:[function(require,module,exports){
 class RewardAssigner {
   constructor(args) {
     this.agents = args.agents
@@ -441,7 +419,7 @@ class RewardAssigner {
 
 module.exports = RewardAssigner
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 let RewardAssigner = require('./reward_assigner.js')
 
 class RewardAssignerList {
@@ -467,7 +445,7 @@ class RewardAssignerList {
 
 module.exports = RewardAssignerList
 
-},{"./reward_assigner.js":9}],11:[function(require,module,exports){
+},{"./reward_assigner.js":8}],10:[function(require,module,exports){
 Environment = require('./environment')
 Q = require('./q');
 RewardAssignerList = require('./reward_assigner_list')
@@ -475,12 +453,11 @@ RewardAssigner = require('./reward_assigner')
 Agent = require('./agent')
 AgentList = require('./agent_list')
 LinearApproximator = require('./linear_approximator')
-Observable = require('./observable')
 Transition = require('./transition')
 AgentFactory = require('./agent_factory')
 utils = require('./utils')
 
-},{"./agent":1,"./agent_factory":2,"./agent_list":3,"./environment":4,"./linear_approximator":5,"./observable":7,"./q":8,"./reward_assigner":9,"./reward_assigner_list":10,"./transition":12,"./utils":14}],12:[function(require,module,exports){
+},{"./agent":1,"./agent_factory":2,"./agent_list":3,"./environment":4,"./linear_approximator":5,"./q":7,"./reward_assigner":8,"./reward_assigner_list":9,"./transition":11,"./utils":13}],11:[function(require,module,exports){
 class Transition {
   constructor(args) {
     this.state = args.state
@@ -502,7 +479,7 @@ class Transition {
 
 module.exports = Transition
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 let utils = require('./utils.js')
 
 class TransitionList {
@@ -527,7 +504,7 @@ class TransitionList {
 
 module.exports = TransitionList
 
-},{"./utils.js":14}],14:[function(require,module,exports){
+},{"./utils.js":13}],13:[function(require,module,exports){
 module.exports.uniqueValues = function (array) {
   return [...new Set(array)]
 }
@@ -545,4 +522,4 @@ module.exports.randomChoiceFrom = function(array) {
   return array[randomIndex]
 }
 
-},{}]},{},[11]);
+},{}]},{},[10]);
