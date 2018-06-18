@@ -15,8 +15,8 @@ class Environment {
     return this.rewardAssignerList.values
   }
 
-  createSentience(objects, observables, actions) {
-    objects.forEach((object) => this.agentList.build(object, observables, actions))
+  createSentience(objects, agentArgs) {
+    objects.forEach((object) => this.agentList.build(object, agentArgs))
   }
 
   rewardSentience(objects, condition, credit) {

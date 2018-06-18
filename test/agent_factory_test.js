@@ -4,13 +4,13 @@ let LinearApproximator = require('../src/linear_approximator.js')
 let assert = require('assert')
 
 describe('AgentFactory', function() {
-  describe('#create', function() {
+  describe('#_build', function() {
     it('creates an agent with a policy and observables', function() {
       let obj = { y: 10, move: () => obj.y += 5 }
       let stateFunc = () => [obj.y]
       let policyDouble = {}
 
-      let agent = AgentFactory.create(obj, stateFunc, ['move'], policyDouble)
+      let agent = AgentFactory._build(obj, stateFunc, ['move'], policyDouble)
 
       assert.deepEqual(agent.state, [10])
       assert.equal(agent.policy, policyDouble)
@@ -24,8 +24,12 @@ describe('AgentFactory', function() {
       let observable = { y: 10}
       let stateFunc = () => [obj.x, obj.y, observable.y]
 
+      let agent = AgentFactory.QLVAAgent(obj, {
+        stateFunction: stateFunc,
+        stateSize: 3,
+        actions: ['move']
+      })
 
-      let agent = AgentFactory.QLVAAgent(obj, stateFunc, 3, ['move'])
       let policy = agent.policy
       let approximator = policy.approximator
 

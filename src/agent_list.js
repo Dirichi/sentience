@@ -10,8 +10,8 @@ class AgentList {
     this.agentFactory = agentFactory
   }
 
-  build(object, observables, actions, policyType = 'QLVAAgent') {
-    let agent = this._buildAgent(object, observables, actions, policyType)
+  build(object, agentArgs) {
+    let agent = this._buildAgent(object, agentArgs)
     object.agent_id = this.values.length
     this.values.push(agent)
   }
@@ -36,10 +36,10 @@ class AgentList {
     return this.values[object.agent_id]
   }
 
-  _buildAgent(object, observables, actions, policyType) {
+  _buildAgent(object, agentArgs) {
     this._preventDuplicates(object)
 
-    return this.agentFactory[policyType](object, observables, actions)
+    return this.agentFactory.build(object, agentArgs)
   }
 
   _preventDuplicates(object) {

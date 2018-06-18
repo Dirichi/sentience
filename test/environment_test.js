@@ -4,27 +4,27 @@ let sinon = require('sinon')
 
 describe('Environment', function() {
   describe('#createSentience', function () {
-    it('creates agents with observables and actions', function () {
+    it('creates agents with passed in arguments', function () {
       let env = new Environment()
-      let observable = { y: 10, attributes: ['y'] }
 
-      let object = { y: 10 }
-      object.move = () => object.y += 5
+      let object = { y: 10, move: () => object.y += 5 }
+      let stateFunc = () => [object.y]
+      let args = { policyType: 'QLVAAgent', actions: ['move'], stateSize: 1, stateFunction: stateFunc }
 
-      env.createSentience([object], [observable], ['move'])
+      env.createSentience([object], args)
       assert.ok(env.agents.length == 1)
     })
 
     it('does not create multiple agents for the same object', function () {
       let env = new Environment()
-      let observable = { y: 10, attributes: ['y'] }
 
-      let object = { y: 10 }
-      object.move = () => object.y += 5
+      let object = { y: 10, move: () => object.y += 5 }
+      let stateFunc = () => [object.y]
+      let args = { policyType: 'QLVAAgent', actions: ['move'], stateSize: 1, stateFunction: stateFunc }
 
-      env.createSentience([object], [observable], ['move'])
+      env.createSentience([object], args)
 
-      assert.throws(() => env.createSentience([object], [observable], ['move']),
+      assert.throws(() => env.createSentience([object], args),
       /Single objects cannot have .* multiple agents.*/)
     })
   })
@@ -32,12 +32,12 @@ describe('Environment', function() {
   describe('#rewardSentience', function () {
     it('creates a rewardAssigner with agents and conditions', function () {
       let env = new Environment()
-      let observable = { y: 10, attributes: ['y'] }
 
-      let object = { y: 10 }
-      object.move = () => object.y += 5
+      let object = { y: 10, move: () => object.y += 5 }
+      let stateFunc = () => [object.y]
+      let args = { policyType: 'QLVAAgent', actions: ['move'], stateSize: 1, stateFunction: stateFunc }
 
-      env.createSentience([object], [observable], ['move'])
+      env.createSentience([object], args)
       env.rewardSentience([object], () => true, 3)
 
       assert.equal(env.rewardAssigners.length, 1)

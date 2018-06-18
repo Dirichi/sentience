@@ -4,18 +4,22 @@ let LinearApproximator = require('./linear_approximator.js')
 let utils = require('./utils.js')
 
 class AgentFactory {
-  static QLVAAgent(object, stateFunction, stateSize, actions) {
+  static QLVAAgent(object, args) {
     let approximator = new LinearApproximator({
-      statesSize: stateSize,
-      actionsSize: actions.length
+      statesSize: args.stateSize,
+      actionsSize: args.actions.length
     })
 
-    let policy = new Q({ approximator: approximator, actions: actions })
+    let policy = new Q({ approximator: approximator, actions: args.actions })
 
-    return this.create(object, stateFunction, actions, policy)
+    return this._build(object, args.stateFunction, args.actions, policy)
   }
 
-  static create(object, stateFunction, actions, policy) {
+  static build(object, args) {
+    return this[args.policyType](object, args)
+  }
+
+  static _build(object, stateFunction, actions, policy) {
 
     return new Agent({
       object: object,
