@@ -1,3 +1,8 @@
+function distance(x, y, x2, y2) {
+  let squareDistance = ((x - x2) ** 2) + ((y - y2) ** 2)
+  return Math.sqrt(squareDistance)
+}
+
 class RewardBuffer {
   constructor(limit) {
     this.limit = limit
@@ -27,6 +32,17 @@ let ball = { y: 0.5, x: 0.5 }
 
 let tick = 0
 let buffer = new RewardBuffer(500)
+
+let tiler = new Tiler({
+  minX: 0,
+  minY: 0,
+  maxX: 1,
+  maxY: 1,
+  xTiles: 10,
+  yTiles: 10,
+  tileRadius: 0.1
+})
+
 let points = []
 
 let Moveable = {
@@ -36,60 +52,33 @@ let Moveable = {
   right() { this.x = Math.min(1, this.x + 0.1) },
   stop() {},
 }
+Object.assign(ball, Moveable)
+Object.assign(chaser, Moveable)
 
 function stateFunc() {
-  let ballLocationMap = []
-  let chaserLocationMap = []
-
-  let ballXIndex = parseInt(ball.x * 5)
-  let ballYIndex = parseInt(ball.y * 5)
-  let chaserXIndex = parseInt(chaser.x * 5)
-  let chaserYIndex = parseInt(chaser.y * 5)
-
-  for (var i = 0; i < 5; i++) {
-    for (var j = 0; j < 5; j++) {
-      if (ballXIndex == i && ballYIndex == j) {
-        ballLocationMap.push(1)
-      }
-      else {
-        ballLocationMap.push(0)
-      }
-    }
-  }
-
-  for (var i = 0; i < 5; i++) {
-    for (var j = 0; j < 5; j++) {
-      if (chaserXIndex == i && chaserYIndex == j) {
-        chaserLocationMap.push(1)
-      }
-      else {
-        chaserLocationMap.push(0)
-      }
-    }
-  }
+  let ballLocationMap = tiler.tileVector(ball.x, ball.y)
+  let chaserLocationMap = tiler.tileVector(chaser.x, chaser.y)
 
   return ballLocationMap.concat(chaserLocationMap)
 }
 
 function setup() {
   createCanvas(1000, 500)
-  Object.assign(ball, Moveable)
-  Object.assign(chaser, Moveable)
 
   let args = {
     actions: ['up', 'down', 'left', 'right', 'stop'],
     stateFunction: stateFunc,
-    stateSize: 50,
+    stateSize: 200,
     policyType: 'QLVAAgent'
   }
   env.createSentience([chaser], args)
 
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) == 0, 0.5)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) > 0.1, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) > 0.2, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) > 0.3, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) > 0.4, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) > 0.5, -0.1)
+  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) < 0.05, 0.5)
+  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.1, -0.1)
+  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.2, -0.1)
+  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.3, -0.1)
+  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.4, -0.1)
+  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.5, -0.1)
 }
 
 function draw() {
@@ -121,11 +110,6 @@ function animate() {
   plotReward(points)
 }
 
-function distance(x, y, x2, y2) {
-  let squareDistance = ((x - x2) ** 2) + ((y - y2) ** 2)
-  return Math.sqrt(squareDistance)
-}
-
 function plotReward(points, min = -0.5, max = 0.5, xstart = 500, xend = 980, ystart = 480, yend = 20) {
   stroke(255)
   line(xstart, ystart, xstart, yend)
@@ -139,7 +123,7 @@ function plotReward(points, min = -0.5, max = 0.5, xstart = 500, xend = 980, yst
     plotRange = yend - ystart
     plotDistance = (distanceFromMin / normalRange) * plotRange
     y = ystart + plotDistance
-    fill(0,255,0)
+    fill(0, 255, 0)
     ellipse(x, y, 3)
     fill(255)
     xlocation += xspace

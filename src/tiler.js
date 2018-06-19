@@ -17,9 +17,11 @@ class Tiler {
         let circleX = i * (this.maxX - this.minX) / this.xTiles
         let circleY = j * (this.maxY - this.minY) / this.yTiles
         if (this._distance(circleX, circleY, x, y) <= this.tileRadius) {
-          tileVector.push(1)
+          tileVec.push(1)
         }
-        tileVector.push(0)
+        else {
+          tileVec.push(0)
+        }
       }
     }
 

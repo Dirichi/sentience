@@ -49,7 +49,7 @@ class Agent {
 
 module.exports = Agent
 
-},{"./transition.js":11}],2:[function(require,module,exports){
+},{"./transition.js":12}],2:[function(require,module,exports){
 let Agent = require('./agent.js')
 let Q = require('./q.js')
 let LinearApproximator = require('./linear_approximator.js')
@@ -84,7 +84,7 @@ class AgentFactory {
 
 module.exports = AgentFactory
 
-},{"./agent.js":1,"./linear_approximator.js":5,"./q.js":7,"./utils.js":13}],3:[function(require,module,exports){
+},{"./agent.js":1,"./linear_approximator.js":5,"./q.js":7,"./utils.js":14}],3:[function(require,module,exports){
 let AgentFactory = require('./agent_factory.js')
 
 class AgentList {
@@ -212,7 +212,7 @@ class LinearApproximator {
 
 module.exports = LinearApproximator
 
-},{"./matrix.js":6,"./utils.js":13}],6:[function(require,module,exports){
+},{"./matrix.js":6,"./utils.js":14}],6:[function(require,module,exports){
 class Matrix {
   constructor(array) {
     this._values = array
@@ -401,7 +401,7 @@ class Q {
 
 module.exports = Q
 
-},{"./transition_list.js":12,"./utils.js":13}],8:[function(require,module,exports){
+},{"./transition_list.js":13,"./utils.js":14}],8:[function(require,module,exports){
 class RewardAssigner {
   constructor(args) {
     this.agents = args.agents
@@ -455,9 +455,49 @@ AgentList = require('./agent_list')
 LinearApproximator = require('./linear_approximator')
 Transition = require('./transition')
 AgentFactory = require('./agent_factory')
+Tiler = require('./tiler')
 utils = require('./utils')
 
-},{"./agent":1,"./agent_factory":2,"./agent_list":3,"./environment":4,"./linear_approximator":5,"./q":7,"./reward_assigner":8,"./reward_assigner_list":9,"./transition":11,"./utils":13}],11:[function(require,module,exports){
+},{"./agent":1,"./agent_factory":2,"./agent_list":3,"./environment":4,"./linear_approximator":5,"./q":7,"./reward_assigner":8,"./reward_assigner_list":9,"./tiler":11,"./transition":12,"./utils":14}],11:[function(require,module,exports){
+class Tiler {
+  constructor(args) {
+    this.minX = args.minX
+    this.minY = args.minY
+    this.maxX = args.maxX
+    this.maxY = args.maxY
+    this.xTiles = args.xTiles
+    this.yTiles = args.yTiles
+    this.tileRadius = args.tileRadius
+  }
+
+  tileVector(x, y) {
+    let tileVec = []
+
+    for (var i = 0; i < this.xTiles; i++) {
+      for (var j = 0; j < this.yTiles; j++) {
+        let circleX = i * (this.maxX - this.minX) / this.xTiles
+        let circleY = j * (this.maxY - this.minY) / this.yTiles
+        if (this._distance(circleX, circleY, x, y) <= this.tileRadius) {
+          tileVec.push(1)
+        }
+        else {
+          tileVec.push(0)
+        }
+      }
+    }
+
+    return tileVec
+  }
+
+  _distance(x, y, x1, y1) {
+    let squaredDistance = ((x - x1) ** 2) + ((y - y1) ** 2)
+    return Math.sqrt(squaredDistance)
+  }
+}
+
+module.exports = Tiler
+
+},{}],12:[function(require,module,exports){
 class Transition {
   constructor(args) {
     this.state = args.state
@@ -479,7 +519,7 @@ class Transition {
 
 module.exports = Transition
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 let utils = require('./utils.js')
 
 class TransitionList {
@@ -504,7 +544,7 @@ class TransitionList {
 
 module.exports = TransitionList
 
-},{"./utils.js":13}],13:[function(require,module,exports){
+},{"./utils.js":14}],14:[function(require,module,exports){
 module.exports.uniqueValues = function (array) {
   return [...new Set(array)]
 }
