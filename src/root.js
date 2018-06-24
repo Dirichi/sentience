@@ -1,0 +1,11 @@
+Environment = require('./environment')
+Q = require('./q');
+RewardAssignerList = require('./reward_assigner_list')
+RewardAssigner = require('./reward_assigner')
+Agent = require('./agent')
+AgentList = require('./agent_list')
+LinearApproximator = require('./linear_approximator')
+Transition = require('./transition')
+AgentFactory = require('./agent_factory')
+Tiler = require('./tiler')
+utils = require('./utils')
