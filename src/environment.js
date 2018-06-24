@@ -19,9 +19,9 @@ class Environment {
     objects.forEach((object) => this.agentList.build(object, agentArgs))
   }
 
-  rewardSentience(objects, condition, credit) {
+  rewardSentience(objects, rewardArgs) {
     let agents = this.agentList.find(objects)
-    this.rewardAssignerList.build(agents, condition, credit)
+    this.rewardAssignerList.build(agents, rewardArgs)
   }
 
   run(callback = () => true) {

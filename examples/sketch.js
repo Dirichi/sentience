@@ -40,23 +40,27 @@ function stateFunc() {
   return ballLocationMap.concat(chaserLocationMap)
 }
 
+function rewardFunc() {
+
+}
+
 function setup() {
   createCanvas(1000, 500)
 
-  let args = {
+  let sentienceArgs = {
     actions: ['up', 'down', 'left', 'right', 'stop'],
     stateFunction: stateFunc,
     stateSize: 200,
     policyType: 'QLVAAgent'
   }
-  env.createSentience([chaser], args)
 
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) < 0.05, 0.5)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.1, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.2, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.3, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.4, -0.1)
-  env.rewardSentience([chaser], () => distance(chaser.x, chaser.y, ball.x, ball.y) >= 0.5, -0.1)
+  let rewardArgs = {
+    condition: () => true,
+    rewardFunction: () => - distance(chaser.x, chaser.y, ball.x, ball.y)
+  }
+
+  env.createSentience([chaser], sentienceArgs)
+  env.rewardSentience([chaser], rewardArgs)
 }
 
 function draw() {
