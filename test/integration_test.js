@@ -22,8 +22,13 @@ let agentArgs = {
   actions: ['up', 'down']
 }
 
+let rewardArgs = {
+  condition: () => Math.abs(chaser.y - ball.y) <= 0.001,
+  rewardFunction: () => 2
+}
+
 env.createSentience([chaser], agentArgs)
-env.rewardSentience([chaser], () => Math.abs(chaser.y - ball.y) <= 0.001, 2)
+env.rewardSentience([chaser], rewardArgs)
 
 describe('Integration', function() {
   it('works together in a beautiful symphony', function() {

@@ -35,16 +35,17 @@ describe('Environment', function() {
 
       let object = { y: 10, move: () => object.y += 5 }
       let stateFunc = () => [object.y]
-      let args = { policyType: 'QLVAAgent', actions: ['move'], stateSize: 1, stateFunction: stateFunc }
+      let agentArgs = { policyType: 'QLVAAgent', actions: ['move'], stateSize: 1, stateFunction: stateFunc }
+      let rewardArgs = { rewardFunction: () => 3, condition: () => true }
 
-      env.createSentience([object], args)
-      env.rewardSentience([object], () => true, 3)
+      env.createSentience([object], agentArgs)
+      env.rewardSentience([object], rewardArgs)
 
       assert.equal(env.rewardAssigners.length, 1)
 
       let assigner = env.rewardAssigners[0]
       assert.deepEqual(assigner.agents, env.agents)
-      assert.equal(assigner.reward, 3)
+      assert.equal(assigner.rewardFunction.call(), 3)
       assert.ok(assigner.condition.call())
     })
   })

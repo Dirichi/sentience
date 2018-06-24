@@ -161,9 +161,9 @@ class Environment {
     objects.forEach((object) => this.agentList.build(object, agentArgs))
   }
 
-  rewardSentience(objects, condition, credit) {
+  rewardSentience(objects, rewardArgs) {
     let agents = this.agentList.find(objects)
-    this.rewardAssignerList.build(agents, condition, credit)
+    this.rewardAssignerList.build(agents, rewardArgs)
   }
 
   run(callback = () => true) {
@@ -405,14 +405,15 @@ module.exports = Q
 class RewardAssigner {
   constructor(args) {
     this.agents = args.agents
-    this.reward = args.reward
+    this.rewardFunction = args.rewardFunction
     this.condition = args.condition
   }
 
   assign() {
     if (this.condition.call()) {
       // refactor to use agentList
-      this.agents.forEach((agent) => agent.rewardCurrentTransition(this.reward))
+      let reward = this.rewardFunction.call()
+      this.agents.forEach((agent) => agent.rewardCurrentTransition(reward))
     }
   }
 }
@@ -427,11 +428,11 @@ class RewardAssignerList {
     this.values = []
   }
 
-  build(agents, condition, credit) {
+  build(agents, rewardArgs) {
     let newAssignerArgs = {
       agents: agents,
-      condition: condition,
-      reward: credit
+      condition: rewardArgs.condition,
+      rewardFunction: rewardArgs.rewardFunction
     }
 
     let assigner = new RewardAssigner(newAssignerArgs)

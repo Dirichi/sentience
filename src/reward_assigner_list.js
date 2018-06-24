@@ -5,11 +5,11 @@ class RewardAssignerList {
     this.values = []
   }
 
-  build(agents, condition, credit) {
+  build(agents, rewardArgs) {
     let newAssignerArgs = {
       agents: agents,
-      condition: condition,
-      reward: credit
+      condition: rewardArgs.condition,
+      rewardFunction: rewardArgs.rewardFunction
     }
 
     let assigner = new RewardAssigner(newAssignerArgs)
