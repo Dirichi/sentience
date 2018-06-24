@@ -3,35 +3,13 @@ function distance(x, y, x2, y2) {
   return Math.sqrt(squareDistance)
 }
 
-class RewardBuffer {
-  constructor(limit) {
-    this.limit = limit
-    this.values = []
-  }
-  add(value) {
-    if (this.full()) { this.values.shift() }
-    this.values.push(value)
-  }
-  full() {
-    return this.values.length == this.limit
-  }
-  clear() {
-    this.values = []
-  }
-  average() {
-    let sum = 0
-    this.values.forEach((v) => sum += v)
-    return sum / this.values.length
-  }
-}
-let counter = 0
 let env = new Environment()
 
 let chaser = { y: 0.5, x: 0.5 }
 let ball = { y: 0.5, x: 0.5 }
 
 let tick = 0
-let buffer = new RewardBuffer(500)
+let buffer = []
 
 let tiler = new Tiler({
   minX: 0,
@@ -94,19 +72,26 @@ function animate() {
   fill(0, 0, 255)
   ellipse(500 * ball.x, 500 * ball.y, 10)
 
-  if (tick > 100) {
-    if(counter > 3) { counter = 0 }
-    let actionChoice = ['up', 'left', 'down', 'right'][counter]
+  if (tick % 100 == 0) {
+    let index = parseInt((tick % 400) / 100)
+    let actionChoice = ['up', 'left', 'down', 'right'][index]
     ball[actionChoice]()
-    tick = 0
-    counter += 1
+    if (tick == 400) { tick = 0 }
   }
-  buffer.add(env.agents[0].currentTransition.reward)
 
-  if (buffer.full()) {
-    points.push(buffer.average())
-    buffer.clear()
+  showRewardProgress(chaser)
+}
+
+function showRewardProgress() {
+  buffer.push(env.agents[0].currentTransition.reward)
+  if (buffer.length >= 500) {
+    let sum = 0
+    buffer.forEach((v) => sum += v)
+    let avg = sum / buffer.length
+    points.push(avg)
+    buffer = []
   }
+
   plotReward(points)
 }
 
@@ -135,6 +120,5 @@ function plotReward(points, min = -0.5, max = 0.5, xstart = 500, xend = 980, yst
 function showStatus() {
   fill(255)
   text(`Epsilon: ${env.agents[0].policy.epsilon}`, 20, 20)
-  text(`Current Distance: ${distance(chaser.x, chaser.y, ball.x, ball.y)}`, 20, 40)
   text(`Current Reward: ${env.agents[0].currentTransition.reward}`, 20, 60)
 }
