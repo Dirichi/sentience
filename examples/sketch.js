@@ -40,10 +40,6 @@ function stateFunc() {
   return ballLocationMap.concat(chaserLocationMap)
 }
 
-function rewardFunc() {
-
-}
-
 function setup() {
   createCanvas(1000, 500)
 
@@ -83,7 +79,7 @@ function animate() {
     if (tick == 400) { tick = 0 }
   }
 
-  showRewardProgress(chaser)
+  showRewardProgress()
 }
 
 function showRewardProgress() {
@@ -99,7 +95,7 @@ function showRewardProgress() {
   plotReward(points)
 }
 
-function plotReward(points, min = -0.5, max = 0.5, xstart = 500, xend = 980, ystart = 480, yend = 20) {
+function plotReward(points, min = -0.5, max = 0, xstart = 500, xend = 980, ystart = 480, yend = 20) {
   stroke(255)
   line(xstart, ystart, xstart, yend)
   let xspace = (xend - xstart) / points.length
