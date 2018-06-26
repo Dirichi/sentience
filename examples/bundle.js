@@ -62,7 +62,9 @@ class AgentFactory {
       actionsSize: args.actions.length
     })
 
-    let policy = new Q({ approximator: approximator, actions: args.actions })
+    let defaultPolicyArgs = { approximator: approximator }
+    let policyArgs = Object.assign(defaultPolicyArgs, args)
+    let policy = new Q(policyArgs)
 
     return this._build(object, args.stateFunction, args.actions, policy)
   }
