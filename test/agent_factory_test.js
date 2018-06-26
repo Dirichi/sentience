@@ -35,10 +35,47 @@ describe('AgentFactory', function() {
 
       assert.ok(policy instanceof Q)
       assert.deepEqual(policy.actions, ['move'])
+      assert.ok(typeof policy.alpha == 'number')
+      assert.ok(typeof policy.epsilon == 'number')
+      assert.ok(typeof policy.epsilonDecay == 'number')
+      assert.ok(typeof policy.gamma == 'number')
 
       assert.ok(approximator instanceof LinearApproximator)
       assert.equal(approximator.statesSize, 3)
       assert.equal(approximator.actionsSize, 1)
+
+      assert.deepEqual(agent.state, [5, 10, 10])
+    })
+
+    it('creates an agent with a Q policy, Linear approximator from passed in args', function() {
+      let obj = { y: 10, x: 5, move: () => obj.y += 5 }
+      let observable = { y: 10}
+      let stateFunc = () => [obj.x, obj.y, observable.y]
+
+      let agent = AgentFactory.QLVAAgent(obj, {
+        stateFunction: stateFunc,
+        stateSize: 3,
+        actions: ['move'],
+        alpha: 0.15,
+        epsilon: 0.85,
+        epsilonDecay: 0.99,
+        gamma: 0.7
+      })
+
+      let policy = agent.policy
+      let approximator = policy.approximator
+
+      assert.ok(policy instanceof Q)
+      assert.deepEqual(policy.actions, ['move'])
+      assert.ok(policy.alpha == 0.15)
+      assert.ok(policy.epsilon == 0.85)
+      assert.ok(policy.epsilonDecay == 0.99)
+      assert.ok(policy.gamma == 0.7)
+
+      assert.ok(approximator instanceof LinearApproximator)
+      assert.equal(approximator.statesSize, 3)
+      assert.equal(approximator.actionsSize, 1)
+
       assert.deepEqual(agent.state, [5, 10, 10])
     })
   })
