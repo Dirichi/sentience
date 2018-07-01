@@ -47,9 +47,7 @@ function setup() {
     actions: ['up', 'down', 'left', 'right', 'stop'],
     stateFunction: stateFunc,
     stateSize: 200,
-    policyType: 'QLVAAgent',
-    alpha: 0.1,
-    epsilonDecay: 0.9995
+    policyType: 'QLVAAgent'
   }
 
   let rewardArgs = {
