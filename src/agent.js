@@ -24,7 +24,7 @@ class Agent {
 
   completeTransition() {
     let nextState = this.state
-    let nextAction = this.policy.choose(nextState)
+    let nextAction = this.policy.bestChoice(nextState)
 
     this.currentTransition.complete(nextState, nextAction)
     this.policy.update(this.currentTransition)

@@ -58,7 +58,7 @@ describe('Agent', function() {
       let updateFunc = sinon.fake()
 
       let stateFunc = () => [1, 3]
-      let policy = { choose: (state) => 'up', update: updateFunc }
+      let policy = { bestChoice: (state) => 'up', update: updateFunc }
       let agent = new Agent({ stateFunction: stateFunc, policy: policy })
 
       agent.currentTransition = { complete: completeFunc }
