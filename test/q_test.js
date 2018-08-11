@@ -2,7 +2,6 @@ let Q = require('../src/q.js')
 let assert = require('assert')
 let sinon = require('sinon')
 let utils = require('../src/utils.js')
-let math = require('mathjs')
 
 describe('Q', function() {
   describe('#choose', function () {
@@ -69,7 +68,7 @@ describe('Q', function() {
       let policy = new Q({ alpha: 0.2, gamma: 0.8, actions: ['A', 'B'], approximator: approximator })
       // 0.2 * ((5 + (0.8 * 10)) - 10) = 0.6
       let err = policy.error(transition)
-      assert.equal(math.round(err, 1), 0.6)
+      assert.equal(err.toPrecision(2), 0.6)
     })
   })
 
