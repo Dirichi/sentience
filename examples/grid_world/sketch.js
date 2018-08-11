@@ -1,8 +1,3 @@
-function distance(x, y, x2, y2) {
-  let squareDistance = ((x - x2) ** 2) + ((y - y2) ** 2)
-  return Math.sqrt(squareDistance)
-}
-
 class Cell {
   constructor(xstart, xlength, ystart, ylength, value) {
     this.xstart = xstart
@@ -83,7 +78,6 @@ class Grid {
 
   locationCell(x, y) {
     let index = this.locationIndex(x, y)
-
     return this.cells[index]
   }
 
@@ -95,15 +89,7 @@ class Grid {
 let grid = new Grid(5, 5, 0, 500, 0, 500)
 
 let env = new Environment()
-let agent = { y: 50, x: 50, size: 10 }
-
-let Moveable = {
-  up() { this.y = Math.max(50, this.y - 100) },
-  down() { this.y = Math.min(450, this.y + 100) },
-  left() { this.x = Math.max(50, this.x - 100) },
-  right() { this.x = Math.min(450, this.x + 100) }
-}
-Object.assign(agent, Moveable)
+let agent = { x: 50, y: 50, minX: 50, maxX: 450, minY: 50, maxY: 450, xStep: 100, yStep: 100, size: 10 }
 
 function runGridAgentInteraction() {
   if (grid.locationCell(agent.x, agent.y) == grid.finalCell) {
@@ -131,6 +117,7 @@ function sentienceInit() {
 }
 
 function setup() {
+  mobilize(agent)
   createCanvas(1000, 500)
   sentienceInit()
 }
@@ -145,6 +132,7 @@ function animate() {
   grid.animate()
   animateAgent()
   runGridAgentInteraction()
+  showRewardProgress()
 }
 
 function animateAgent() {
@@ -152,47 +140,4 @@ function animateAgent() {
   fill(0, 0, 255)
   ellipse(agent.x, agent.y, agent.size)
   pop()
-}
-
-function showRewardProgress() {
-  buffer.push(env.agents[0].currentTransition.reward)
-  if (buffer.length >= 500) {
-    let sum = 0
-    buffer.forEach((v) => sum += v)
-    let avg = sum / buffer.length
-    points.push(avg)
-    buffer = []
-  }
-
-  plotReward(points)
-}
-
-function plotReward(points, min = -0.5, max = 0, xstart = 500, xend = 980, ystart = 480, yend = 20) {
-  stroke(255)
-  line(xstart, ystart, xstart, yend)
-  let xspace = (xend - xstart) / points.length
-  let xlocation = xstart
-
-  points.forEach(function(p) {
-    x = xlocation
-    distanceFromMin = p - min
-    normalRange = max - min
-    plotRange = yend - ystart
-    plotDistance = (distanceFromMin / normalRange) * plotRange
-    y = ystart + plotDistance
-    fill(0, 255, 0)
-    ellipse(x, y, 3)
-    fill(255)
-    xlocation += xspace
-  })
-  line(xstart, ystart, xend, ystart)
-  stroke(0)
-}
-
-function showStatus() {
-  fill(255)
-  let epsilon = env.agents[0].policy.epsilon.toPrecision(3)
-  let reward = (env.agents[0].currentTransition.reward || 0).toPrecision(3)
-  text(`Epsilon: ${epsilon}`, 10, 20)
-  text(`Reward: ${reward}`, 10, 60)
 }
