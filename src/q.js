@@ -26,6 +26,10 @@ class Q {
     return Math.random() > this.epsilon ? this._bestAction(state) : this._randomAction()
   }
 
+  bestChoice(state) {
+    return this._bestAction(state)
+  }
+
   update(transition) {
     let t = this._transformTransition(transition)
     this.transitionList.store(t)
@@ -39,7 +43,7 @@ class Q {
 
   error(t) {
     let Qsa = this._get(t.state, t.action)
-    let QNsNa = this._get(t.nextState, t.nextAction)
+    let QNsNa = Math.max(...this._get(t.nextState))
 
     let unweighted_err = (t.reward + (this.gamma * QNsNa)) - Qsa
     let err = this.alpha * unweighted_err
