@@ -38,7 +38,8 @@ function sentienceInit() {
 }
 
 function setup() {
-  createCanvas(1000, 500)
+  canvas = createCanvas(1000, 500);
+  canvas.parent('sketch-holder');
   mobilize(chaser)
   mobilize(ball)
   sentienceInit()
@@ -69,3 +70,4 @@ function runBallMotion() {
     ball[actionChoice]()
   }
 }
+

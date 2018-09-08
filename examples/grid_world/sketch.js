@@ -118,7 +118,8 @@ function sentienceInit() {
 
 function setup() {
   mobilize(agent)
-  createCanvas(1000, 500)
+    canvas = createCanvas(1000, 500);
+    canvas.parent('sketch-holder');
   sentienceInit()
 }
 
