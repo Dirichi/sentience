@@ -21,7 +21,7 @@
 
  // reward the chaser when its y is the same as the ball's y
  // i.e. reward it when it catches the ball
- env.rewardSentience([chaser], () => Math.abs(chaser.y == ball.y) < 0.2, 2)
+ env.rewardSentience([chaser], () => Math.abs(chaser.y - ball.y) < 0.2, 2)
 
 // run the environment. if all goes well you should see that the console.log
 // print outs hover around 0.2 or less
